@@ -559,18 +559,16 @@ OMX_ERRORTYPE Exynos_OMX_FlushPort(
         Exynos_ResetCodecData(&pExynosPort->processData);
     }
 
-    if (pExynosPort->bufferSemID != NULL) {
-        while (1) {
-            OMX_S32 cnt = 0;
-            Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
-            if (cnt == 0)
-                break;
-            else if (cnt > 0)
-                Exynos_OSAL_SemaphoreWait(pExynosPort->bufferSemID);
-            else if (cnt < 0)
-                Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
-            Exynos_OSAL_SleepMillisec(0);
-        }
+    while (1) {
+        OMX_S32 cnt = 0;
+        Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
+        if (cnt == 0)
+            break;
+        else if (cnt > 0)
+            Exynos_OSAL_SemaphoreWait(pExynosPort->bufferSemID);
+        else if (cnt < 0)
+            Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
+        Exynos_OSAL_SleepMillisec(0);
     }
     Exynos_OSAL_ResetQueue(&pExynosPort->bufferQ);
 
@@ -642,16 +640,14 @@ OMX_ERRORTYPE Exynos_OMX_BufferFlush(
     if (pExynosPort->bufferProcessType & BUFFER_COPY)
         Exynos_OSAL_SemaphorePost(pExynosPort->codecSemID);
 
-    if (pExynosPort->bufferSemID != NULL) {
-        while (1) {
-            OMX_S32 cnt = 0;
-            Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
-            if (cnt > 0)
-                break;
-            else
-                Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
-            Exynos_OSAL_SleepMillisec(0);
-        }
+    while (1) {
+        OMX_S32 cnt = 0;
+        Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
+        if (cnt > 0)
+            break;
+        else
+            Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
+        Exynos_OSAL_SleepMillisec(0);
     }
 
     pVideoEnc->exynos_codec_bufferProcessRun(pOMXComponent, nPortIndex);
@@ -1209,12 +1205,12 @@ OMX_ERRORTYPE Exynos_OMX_VideoEncodeGetParameter(
                 break;
             case supportFormat_2:
                 pPortFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                pPortFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)OMX_SEC_COLOR_FormatNV12Tiled;
+                pPortFormat->eColorFormat       = OMX_SEC_COLOR_FormatNV12Tiled;
                 pPortFormat->xFramerate         = pPortDef->format.video.xFramerate;
                 break;
             case supportFormat_3:
                 pPortFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                pPortFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)OMX_SEC_COLOR_FormatNV21Linear;
+                pPortFormat->eColorFormat       = OMX_SEC_COLOR_FormatNV21Linear;
                 pPortFormat->xFramerate         = pPortDef->format.video.xFramerate;
                 break;
             case supportFormat_4:
@@ -1222,23 +1218,6 @@ OMX_ERRORTYPE Exynos_OMX_VideoEncodeGetParameter(
                 pPortFormat->eColorFormat       = OMX_COLOR_FormatAndroidOpaque;
                 pPortFormat->xFramerate         = pPortDef->format.video.xFramerate;
                 break;
-#ifdef USE_ENCODER_RGBINPUT_SUPPORT
-            case supportFormat_5:
-                pPortFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                pPortFormat->eColorFormat       = (OMX_COLOR_FORMATTYPE)OMX_SEC_COLOR_FormatYVU420Planar;
-                pPortFormat->xFramerate         = pPortDef->format.video.xFramerate;
-                break;
-            case supportFormat_6:
-                pPortFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                pPortFormat->eColorFormat       = OMX_COLOR_Format32bitARGB8888;
-                pPortFormat->xFramerate         = pPortDef->format.video.xFramerate;
-                break;
-            case supportFormat_7:
-                pPortFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                pPortFormat->eColorFormat       = OMX_COLOR_Format32bitBGRA8888;
-                pPortFormat->xFramerate         = pPortDef->format.video.xFramerate;
-                break;
-#endif
             default:
                 if (nIndex > supportFormat_0) {
                     ret = OMX_ErrorNoMore;

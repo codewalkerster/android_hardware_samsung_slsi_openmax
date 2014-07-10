@@ -503,18 +503,16 @@ OMX_ERRORTYPE Exynos_OMX_FlushPort(OMX_COMPONENTTYPE *pOMXComponent, OMX_S32 por
         Exynos_ResetCodecData(&pExynosPort->processData);
     }
 
-    if (pExynosPort->bufferSemID != NULL) {
-        while (1) {
-            OMX_S32 cnt = 0;
-            Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
-            if (cnt == 0)
-                break;
-            else if (cnt > 0)
-                Exynos_OSAL_SemaphoreWait(pExynosPort->bufferSemID);
-            else if (cnt < 0)
-                Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
-            Exynos_OSAL_SleepMillisec(0);
-        }
+    while (1) {
+        OMX_S32 cnt = 0;
+        Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
+        if (cnt == 0)
+            break;
+        else if (cnt > 0)
+            Exynos_OSAL_SemaphoreWait(pExynosPort->bufferSemID);
+        else if (cnt < 0)
+            Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
+        Exynos_OSAL_SleepMillisec(0);
     }
     Exynos_OSAL_ResetQueue(&pExynosPort->bufferQ);
 
@@ -567,16 +565,14 @@ OMX_ERRORTYPE Exynos_OMX_BufferFlush(OMX_COMPONENTTYPE *pOMXComponent, OMX_S32 n
     if (pExynosComponent->pExynosPort[nPortIndex].bufferProcessType & BUFFER_COPY)
         Exynos_OSAL_SemaphorePost(pExynosPort->codecSemID);
 
-    if (pExynosPort->bufferSemID != NULL) {
-        while (1) {
-            OMX_S32 cnt = 0;
-            Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
-            if (cnt > 0)
-                break;
-            else
-                Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
-            Exynos_OSAL_SleepMillisec(0);
-        }
+    while (1) {
+        OMX_S32 cnt = 0;
+        Exynos_OSAL_Get_SemaphoreCount(pExynosPort->bufferSemID, &cnt);
+        if (cnt > 0)
+            break;
+        else
+            Exynos_OSAL_SemaphorePost(pExynosPort->bufferSemID);
+        Exynos_OSAL_SleepMillisec(0);
     }
 
     pVideoDec->exynos_codec_bufferProcessRun(pOMXComponent, nPortIndex);
@@ -1060,18 +1056,6 @@ OMX_ERRORTYPE Exynos_OMX_VideoDecodeGetParameter(
                     portFormat->eColorFormat       = OMX_SEC_COLOR_FormatNV12Tiled;
                     portFormat->xFramerate         = portDefinition->format.video.xFramerate;
                     break;
-#ifdef USE_DUALDPB_MODE
-                case supportFormat_3:
-                    portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                    portFormat->eColorFormat       = OMX_SEC_COLOR_FormatNV21Linear;
-                    portFormat->xFramerate         = portDefinition->format.video.xFramerate;
-                    break;
-                case supportFormat_4:
-                    portFormat->eCompressionFormat = OMX_VIDEO_CodingUnused;
-                    portFormat->eColorFormat       = OMX_SEC_COLOR_FormatYVU420Planar;
-                    portFormat->xFramerate         = portDefinition->format.video.xFramerate;
-                    break;
-#endif
                 default:
                     if (index > supportFormat_0) {
                         ret = OMX_ErrorNoMore;

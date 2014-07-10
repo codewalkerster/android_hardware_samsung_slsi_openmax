@@ -151,7 +151,6 @@ typedef struct _EXYNOS_OMX_BASEPORT
     OMX_HANDLETYPE                 bufferSemID;
     EXYNOS_QUEUE                   bufferQ;
     OMX_U32                        assignedBufferNum;
-    OMX_U32                        nPlaneCnt;
     OMX_STATETYPE                  portState;
     OMX_HANDLETYPE                 loadedResource;
     OMX_HANDLETYPE                 unloadedResource;

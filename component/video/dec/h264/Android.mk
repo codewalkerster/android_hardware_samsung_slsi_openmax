@@ -22,13 +22,7 @@ LOCAL_CFLAGS += -DUSE_DMA_BUF
 endif
 
 ifeq ($(BOARD_USE_S3D_SUPPORT), true)
-ifeq ($(BOARD_USES_HWC_SERVICES), true)
 LOCAL_CFLAGS += -DUSE_S3D_SUPPORT
-else
-ifeq ($(TARGET_BOARD_PLATFORM), exynos5)
-LOCAL_CFLAGS += -DUSE_S3D_SUPPORT
-endif
-endif
 endif
 
 ifeq ($(BOARD_USE_CSC_HW), true)
@@ -37,10 +31,6 @@ endif
 
 ifeq ($(BOARD_USE_QOS_CTRL), true)
 LOCAL_CFLAGS += -DUSE_QOS_CTRL
-endif
-
-ifeq ($(BOARD_USE_DUALDPB_MODE), true)
-LOCAL_CFLAGS += -DUSE_DUALDPB_MODE
 endif
 
 LOCAL_ARM_MODE := arm

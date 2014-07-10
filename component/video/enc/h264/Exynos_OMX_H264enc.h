@@ -61,9 +61,8 @@ typedef struct _EXYNOS_MFC_H264ENC_HANDLE
 typedef struct _EXYNOS_H264ENC_HANDLE
 {
     /* OMX Codec specific */
-    OMX_VIDEO_PARAM_AVCTYPE             AVCComponent[ALL_PORT_NUM];
+    OMX_VIDEO_PARAM_AVCTYPE AVCComponent[ALL_PORT_NUM];
     OMX_VIDEO_PARAM_ERRORCORRECTIONTYPE errorCorrectionType[ALL_PORT_NUM];
-    OMX_VIDEO_PARAM_AVCSLICEFMO         AVCSliceFmo;
 
     /* SEC MFC Codec specific */
     EXYNOS_MFC_H264ENC_HANDLE hMFCH264Handle;
